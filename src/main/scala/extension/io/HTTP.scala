@@ -7,27 +7,11 @@ import java.util.concurrent.CompletableFuture
 import scala.concurrent.Future
 import extension.concurrent.javaFuture2Scala
 
-import java.net.{URI, URL}
-
 object HTTP {
 
   implicit val defaultClient: OkHttpClient = new OkHttpClient()
 
   def client(implicit impl: OkHttpClient = defaultClient): OkHttpClient = impl
-
-  def request(
-      method:  String                 = "GET",
-      uri:     URL,
-      headers: List[(String, String)] = List(),
-      body:    String                 = null
-  ): Future[Response] = request(method, uri.toString, headers, body)
-
-  def request(
-      method:  String                 = "GET",
-      uri:     URI,
-      headers: List[(String, String)] = List(),
-      body:    String                 = null
-  ): Future[Response] = request(method, uri.toString, headers, body)
 
   def request(
       method:  String                 = "GET",

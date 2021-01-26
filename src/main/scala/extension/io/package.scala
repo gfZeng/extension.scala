@@ -2,7 +2,7 @@ package extension
 
 import java.io.{ByteArrayInputStream, Closeable, InputStream}
 import java.lang.reflect.Field
-import java.net.URI
+import java.net.{URI, URL}
 import java.nio.ByteBuffer
 import java.util.zip.GZIPInputStream
 import scala.concurrent.{Await, Future}
@@ -32,6 +32,8 @@ package object io {
     def await(duration: Duration = Duration.Inf): T = Await.result(f, duration)
   }
 
-  implicit def String2Uri(s: String): URI = URI.create(s)
+  implicit def String2URI(s:   String): URI    = URI.create(s)
+  implicit def URI2String(uri: URI):    String = uri.toString
+  implicit def URL2String(url: URL):    String = url.toString
 
 }

@@ -7,6 +7,8 @@ import java.util.concurrent.CompletableFuture
 import scala.concurrent.Future
 import extension.concurrent.javaFuture2Scala
 
+import java.net.{URI, URL}
+
 object HTTP {
 
   implicit val defaultClient: OkHttpClient = new OkHttpClient()
@@ -15,11 +17,23 @@ object HTTP {
 
   def request(
       method:  String                 = "GET",
+      uri:     URL,
+      headers: List[(String, String)] = List(),
+      body:    String                 = null
+  ): Future[Response] = request(method, uri.toString, headers, body)
+
+  def request(
+      method:  String                 = "GET",
+      uri:     URI,
+      headers: List[(String, String)] = List(),
+      body:    String                 = null
+  ): Future[Response] = request(method, uri.toString, headers, body)
+
+  def request(
+      method:  String                 = "GET",
       uri:     String,
       headers: List[(String, String)] = List(),
       body:    String                 = null
-  )(
-      cb: (IOException, Response) => Unit = null
   ): Future[Response] = {
     val builder = new Request.Builder().url(uri)
     var contentType: String = null
@@ -35,24 +49,16 @@ object HTTP {
     }
     val req = builder.build()
 
-    val frsp = if (cb == null) new CompletableFuture[Response]() else null
+    val frsp = new CompletableFuture[Response]()
     client
       .newCall(req)
       .enqueue(new Callback() {
         def onFailure(call: Call, e: IOException): Unit = {
-          if (cb == null) {
-            frsp.completeExceptionally(e)
-          } else {
-            cb(e, null)
-          }
+          frsp.completeExceptionally(e)
         }
 
         def onResponse(call: Call, rsp: Response): Unit = {
-          if (cb == null) {
-            frsp.complete(rsp)
-          } else {
-            cb(null, rsp)
-          }
+          frsp.complete(rsp)
         }
       })
     frsp

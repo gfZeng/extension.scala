@@ -28,4 +28,6 @@ package object system {
     Random.alphanumeric.take(n).mkString("")
   }
 
+  def halt(status: Int): Unit = Runtime.getRuntime.halt(status)
+
 }

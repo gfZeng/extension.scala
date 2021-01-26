@@ -6,6 +6,7 @@ import java.net.URI
 import scala.concurrent.Future
 import extension.concurrent.javaFuture2Scala
 
+@Deprecated
 object http {
   implicit val stringBodyHandler:    BodyHandler[String]      = BodyHandlers.ofString()
   implicit val byteArrayBodyHandler: BodyHandler[Array[Byte]] = BodyHandlers.ofByteArray()

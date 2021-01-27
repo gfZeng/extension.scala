@@ -27,10 +27,12 @@ object HTTP {
       }
       builder.header(head._1, head._2)
     }
-    if (body != null) {
-      val reqBody = RequestBody.create(body, MediaType.get(contentType))
-      builder.method(method, reqBody)
-    }
+    val reqBody =
+      if (body == null) null
+      else
+        RequestBody.create(body, MediaType.get(contentType))
+    builder.method(method, reqBody)
+
     val req = builder.build()
 
     val frsp = new CompletableFuture[Response]()

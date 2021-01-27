@@ -28,10 +28,6 @@ package object io {
     def gzip = new GZIPInputStream(in)
   }
 
-  implicit class FutureOps[+T](f: Future[T]) {
-    def await(duration: Duration = Duration.Inf): T = Await.result(f, duration)
-  }
-
   implicit def String2URI(s:   String): URI    = URI.create(s)
   implicit def URI2String(uri: URI):    String = uri.toString
   implicit def URL2String(url: URL):    String = url.toString

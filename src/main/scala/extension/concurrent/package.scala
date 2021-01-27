@@ -2,7 +2,8 @@ package extension
 
 import java.util.concurrent.CompletionStage
 import scala.compat.java8.FutureConverters.CompletionStageOps
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration.Duration
 
 package object concurrent {
 
@@ -18,4 +19,9 @@ package object concurrent {
     th.start()
     th
   }
+
+  implicit class FutureOps[+T](f: Future[T]) {
+    def await(duration: Duration = Duration.Inf): T = Await.result(f, duration)
+  }
+
 }

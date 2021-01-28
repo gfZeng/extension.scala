@@ -1,6 +1,7 @@
 package extension
 
 import java.util.concurrent.CompletionStage
+import java.util.{Timer, TimerTask}
 import scala.compat.java8.FutureConverters.CompletionStageOps
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
@@ -22,6 +23,18 @@ package object concurrent {
 
   implicit class FutureOps[+T](f: Future[T]) {
     def await(duration: Duration = Duration.Inf): T = Await.result(f, duration)
+  }
+
+  lazy val timer = new Timer()
+
+  def schedule(delay: Long, period: Long)(task: => Unit): Unit = {
+    timer.schedule(
+      new TimerTask {
+        def run(): Unit = task
+      },
+      delay,
+      period
+    )
   }
 
 }

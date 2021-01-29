@@ -1,11 +1,9 @@
 package extension.io
 
-import okhttp3.{Call, Callback, MediaType, OkHttpClient, Request, RequestBody, Response}
+import okhttp3._
 
 import java.io.IOException
-import java.util.concurrent.CompletableFuture
-import scala.concurrent.Future
-import extension.concurrent.javaFuture2Scala
+import scala.concurrent.Promise
 
 object HTTP {
 
@@ -18,7 +16,7 @@ object HTTP {
       uri:     String,
       headers: List[(String, String)] = List(),
       body:    String                 = null
-  ): Future[Response] = {
+  ): Promise[Response] = {
     val builder = new Request.Builder().url(uri)
     var contentType: String = null
     headers.foreach { head =>
@@ -35,16 +33,16 @@ object HTTP {
 
     val req = builder.build()
 
-    val frsp = new CompletableFuture[Response]()
+    val frsp = Promise[Response]
     client
       .newCall(req)
       .enqueue(new Callback() {
         def onFailure(call: Call, e: IOException): Unit = {
-          frsp.completeExceptionally(e)
+          frsp.failure(e)
         }
 
         def onResponse(call: Call, rsp: Response): Unit = {
-          frsp.complete(rsp)
+          frsp.success(rsp)
         }
       })
     frsp

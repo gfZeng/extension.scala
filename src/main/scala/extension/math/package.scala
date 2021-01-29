@@ -36,4 +36,8 @@ package object math {
   final val TWO  = "2".d
   final val TEN  = "10".d
 
+  def clamp(v: BigDecimal, min: BigDecimal, max: BigDecimal): BigDecimal = {
+    min.max(v.min(max))
+  }
+
 }

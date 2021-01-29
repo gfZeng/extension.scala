@@ -13,7 +13,7 @@ trait Notifier[T] {
 }
 
 class Telegram extends Notifier[String] {
-  private final val chatId = -1001229266534L //-380659103
+  private final val chatId = "chat.id".prop
   private final val url = {
     val token = "bot.token".prop
     s"https://api.telegram.org/bot${token}/sendMessage"

@@ -3,7 +3,7 @@ package extension.io
 import okhttp3._
 
 import java.io.IOException
-import scala.concurrent.Promise
+import scala.concurrent.{Future, Promise}
 
 object HTTP {
 
@@ -16,7 +16,7 @@ object HTTP {
       uri:     String,
       headers: List[(String, String)] = List(),
       body:    String                 = null
-  ): Promise[Response] = {
+  ): Future[Response] = {
     val builder = new Request.Builder().url(uri)
     var contentType: String = null
     headers.foreach { head =>
@@ -45,7 +45,7 @@ object HTTP {
           frsp.success(rsp)
         }
       })
-    frsp
+    frsp.future
   }
 
 }

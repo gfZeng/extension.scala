@@ -38,7 +38,7 @@ package object concurrent {
     )
   }
 
-  type RetryFn[T] = (T, Throwable) => Boolean
+  type RetryFn[-T] = (T, Throwable) => Boolean
 
   def noRetry[T]: RetryFn[T] = (_, _) => false
 

@@ -4,7 +4,7 @@ import extension.logging.{ILogger, Log}
 import play.api.libs.json.{Json, JsValue}
 import sun.net.ConnectionResetException
 
-import java.net.URI
+import java.net.{SocketException, URI}
 import java.net.http.{HttpClient, WebSocket => RawWebSocket}
 import java.nio.ByteBuffer
 import java.util.concurrent.{CompletableFuture, CompletionStage}
@@ -119,6 +119,12 @@ abstract class WebSocket[T](
     log.error(e)(uri.toString)
     e match {
       case _: ConnectionResetException => reconnect(-1, e.getMessage)
+      case _: SocketException =>
+        if (e.getMessage.contains("Connection reset")) {
+          reconnect(-1, e.getMessage)
+        } else {
+          throw e
+        }
       case _ => throw e
     }
   }

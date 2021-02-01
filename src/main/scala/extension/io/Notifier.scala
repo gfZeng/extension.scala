@@ -1,7 +1,6 @@
 package extension.io
 
 import extension.system.StringConversation
-import extension.io.http.stringBodyHandler
 import extension.logging.Log
 
 import java.net.URLEncoder
@@ -23,8 +22,8 @@ class Telegram extends Notifier[String] {
     val escaped = URLEncoder.encode(msg, "UTF-8")
     val data    = s"chat_id=$chatId&text=$escaped&parse_mode=Markdown"
     val headers = List("Content-Type" -> "application/x-www-form-urlencoded")
-    http
-      .request[String](method = "POST", uri = url, headers = headers, body = data)
+    HTTP
+      .request(method = "POST", uri = url, headers = headers, body = data)
       .map { rsp =>
         true
       }

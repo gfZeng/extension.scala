@@ -12,11 +12,11 @@ object HTTP {
   def client(implicit impl: OkHttpClient = defaultClient): OkHttpClient = impl
 
   def request(
-      method:  String                 = "GET",
-      uri:     String,
-      headers: List[(String, String)] = List(),
-      body:    String                 = null
-  ): Future[Response] = {
+               method:  String                 = "GET",
+               uri:     String,
+               headers: List[(String, String)] = List(),
+               body:    String                 = null
+             ): Future[Response] = {
     val builder = new Request.Builder().url(uri)
     var contentType: String = null
     headers.foreach { head =>

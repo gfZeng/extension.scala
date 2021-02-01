@@ -1,6 +1,8 @@
 package extension
 
+import java.io.File
 import java.net.URL
+import java.util.Properties
 import scala.util.Random
 
 package object system {
@@ -32,5 +34,15 @@ package object system {
 
   def nowMs():      Long = System.currentTimeMillis()
   def nowSeconds(): Long = System.currentTimeMillis() / 1000L
+
+  def loadProps(path: String): Unit = {
+    loadProps(new File(path).toURI.toURL)
+  }
+
+  def loadProps(url: URL): Unit = {
+    val tmp = new Properties()
+    tmp.load(url.openStream())
+    System.setProperties(tmp)
+  }
 
 }

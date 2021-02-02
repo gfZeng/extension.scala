@@ -25,6 +25,7 @@ class Telegram extends Notifier[String] {
     HTTP
       .request(method = "POST", uri = url, headers = headers, body = data)
       .map { rsp =>
+        rsp.body().string()
         true
       }
       .recover { e =>

@@ -32,8 +32,8 @@ package object system {
 
   def halt(status: Int): Unit = Runtime.getRuntime.halt(status)
 
-  def nowMs():      Long = System.currentTimeMillis()
-  def nowSeconds(): Long = System.currentTimeMillis() / 1000L
+  @inline def nowMs():      Long = System.currentTimeMillis()
+  @inline def nowSeconds(): Long = System.currentTimeMillis() / 1000L
 
   def loadProps(path: String): Unit = {
     loadProps(new File(path).toURI.toURL)

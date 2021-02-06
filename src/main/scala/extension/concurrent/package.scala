@@ -28,6 +28,15 @@ package object concurrent {
 
   lazy val timer = new Timer()
 
+  def schedule(delay: Long)(task: => Unit): Unit = {
+    timer.schedule(
+      new TimerTask {
+        def run(): Unit = task
+      },
+      delay
+    )
+  }
+
   def schedule(delay: Long, period: Long)(task: => Unit): Unit = {
     timer.schedule(
       new TimerTask {

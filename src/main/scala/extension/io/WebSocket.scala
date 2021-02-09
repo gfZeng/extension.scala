@@ -1,7 +1,8 @@
 package extension.io
 
+import extension.data.JSON
+import extension.data.JSON.JValue
 import extension.logging.{ILogger, Log}
-import play.api.libs.json.{Json, JsValue}
 import sun.net.ConnectionResetException
 
 import java.net.{SocketException, URI}
@@ -97,8 +98,11 @@ abstract class WebSocket[T](
 
   }
 
-  def send(msg: T): Unit =
-    connection.sendText(msg.toString, true)
+  def send[V](msg: V): Unit =
+    connection.sendText(JSON.write[V](msg), true)
+
+  def sendText(msg: String): Unit =
+    connection.sendText(msg, true)
 
   def onMessage(msg: T): Unit = {
     consume(msg)
@@ -157,18 +161,18 @@ abstract class WebSocket[T](
     }
   }
 
-  implicit final class EventHandler(f: () => Unit) {
+  implicit final class EventHandler(f: => Unit) {
     @volatile var conn: RawWebSocket = null
     def apply(ws: RawWebSocket): Unit =
       this.synchronized {
         if (this.conn == ws) return
         this.conn = ws
-        f()
+        f
       }
   }
 
   @volatile var connnectedHandlers = immutable.HashMap[String, EventHandler]()
-  def onConnected(key: String)(f: () => Unit): Unit = {
+  def onConnected(key: String)(f: => Unit): Unit = {
     connnectedHandlers += key -> f
     fConnection.thenAccept { conn =>
       connnectedHandlers.get(key).map(_(conn))
@@ -182,15 +186,15 @@ abstract class WebSocket[T](
 
 object WebSocket {
   implicit def toRawWebSocket[T](ws: WebSocket[T]): RawWebSocket = ws.connection
-  implicit object JsValueDecode extends WebSocketDecoder[JsValue] {
-    override def apply(bb: ByteBuffer): JsValue = Json.parse(bb.inputStream)
+  implicit object JValueDecode extends WebSocketDecoder[JValue] {
+    override def apply(bb: ByteBuffer): JValue = JSON.parse(bb.inputStream)
 
-    override def apply(s: String): JsValue = Json.parse(s)
+    override def apply(s: String): JValue = JSON.parse(s)
   }
 
-  implicit object JsValueDecodeWithGZIP extends WebSocketDecoder[JsValue] {
-    override def apply(bb: ByteBuffer): JsValue = Json.parse(new GZIPInputStream(bb.inputStream))
+  implicit object JValueDecodeWithGZIP extends WebSocketDecoder[JValue] {
+    override def apply(bb: ByteBuffer): JValue = JSON.parse(new GZIPInputStream(bb.inputStream))
 
-    override def apply(s: String): JsValue = Json.parse(s)
+    override def apply(s: String): JValue = JSON.parse(s)
   }
 }

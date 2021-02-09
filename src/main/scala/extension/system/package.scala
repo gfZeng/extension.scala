@@ -42,6 +42,7 @@ package object system {
   def loadProps(url: URL): Unit = {
     val tmp = new Properties()
     tmp.load(url.openStream())
+    tmp.putAll(System.getProperties)
     System.setProperties(tmp)
   }
 

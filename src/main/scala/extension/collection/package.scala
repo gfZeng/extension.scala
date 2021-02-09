@@ -24,4 +24,16 @@ package object collection {
 
     def firstOrNull: E = firstOr(null.asInstanceOf[E])
   }
+
+  implicit final class ToMap[E](xs: Iterable[E]) {
+
+    def asMap[K](kf: E => K): Map[K, E] = {
+      xs.map(v => (kf(v), v)).toMap
+    }
+
+    def xMap[K, V](kvf: E => (K, V)): Map[K, V] = {
+      xs.map(kvf).toMap
+    }
+
+  }
 }

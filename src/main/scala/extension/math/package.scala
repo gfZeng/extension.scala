@@ -1,6 +1,7 @@
 package extension
 
 import scala.math.BigDecimal.RoundingMode._
+import scala.reflect.ClassTag
 
 package object math {
 
@@ -22,12 +23,12 @@ package object math {
 
   def D(s: String) = BigDecimal(s)
   implicit final class StringContext2Decimal(sc: StringContext) {
-    def d() = D(sc.parts.mkString)
+    def d(): BigDecimal = D(sc.parts.mkString)
   }
 
   implicit final class String2Decimal(private val s: String) {
 
-    def d = D(s)
+    def d: BigDecimal = D(s)
   }
 
   final val Inf  = BigDecimal(1, -18)
@@ -38,6 +39,10 @@ package object math {
 
   def clamp(v: BigDecimal, min: BigDecimal, max: BigDecimal): BigDecimal = {
     min.max(v.min(max))
+  }
+
+  def clamp[T <: Ordered[T]: ClassTag](x: T, y: T, z: T): T = {
+    Array(Array(x, y).min, z).max
   }
 
 }

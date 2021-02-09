@@ -1,9 +1,11 @@
 package extension.io
 
 import extension.concurrent.thread
+import extension.data.JSON
+import extension.data.JSON._
 import extension.system.StringConversation
 import extension.logging.Log
-import play.api.libs.json.{Json, JsValue}
+
 import java.net.URLEncoder
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -56,8 +58,8 @@ class Telegram extends Notifier[String] with Bot[String] {
         val f = HTTP
           .request(method = "POST", uri = s"$baseURL/getUpdates", headers = defaultHeaders, data)
           .map { rsp =>
-            val json      = Json.parse(rsp.body().string())
-            val msgs      = (json \ "result").as[List[JsValue]]
+            val json      = JSON.parse(rsp.body().string())
+            val msgs      = (json \ "result").children
             val updateIDS = msgs.map(v => (v \ "update_id").as[Int])
             val updateID  = updateIDS.maxOption.getOrElse(Int.MinValue)
             offset = updateID + 1

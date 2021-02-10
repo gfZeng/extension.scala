@@ -1,6 +1,16 @@
 package extension.data
 
-import org.json4s.{DefaultFormats, DefaultReaders, Formats, JString, Reader}
+import org.json4s.{
+  CustomSerializer,
+  DefaultFormats,
+  DefaultReaders,
+  Formats,
+  JDecimal,
+  JString,
+  Reader,
+  Serializer
+}
+import org.json4s.ext.EnumNameSerializer
 import org.json4s.native.{JsonMethods, Serialization}
 
 import java.io.InputStream
@@ -17,7 +27,23 @@ object JSON extends DefaultReaders {
       }
   }
 
-  implicit val formats: Formats = DefaultFormats
+  object BigDecimalSerializer
+      extends CustomSerializer[BigDecimal]({ _ =>
+        (
+          { case x: JValue => DecimalReader.read(x) },
+          { case x: BigDecimal => JDecimal(x) }
+        )
+      })
+
+  implicit var formats: Formats = DefaultFormats + BigDecimalSerializer
+
+  def registerEnums(es: Enumeration*): Unit = {
+    es.foreach(e => formats += new EnumNameSerializer(e))
+  }
+
+  def register(fmt: Serializer[_]): Unit = {
+    formats += fmt
+  }
 
   def parse(s: String): JValue = JsonMethods.parse(s)
 

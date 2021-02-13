@@ -136,7 +136,9 @@ abstract class WebSocket[T](
     val f = fConnection
     f.thenAccept { conn =>
       if (f == fConnection)
-        connnectedHandlers.values.foreach(_(conn))
+        connnectedHandlers.values.toList
+          .sortBy(_.ordering)
+          .foreach(_(conn))
     }
   }
   var fConnection = connect()
@@ -161,7 +163,7 @@ abstract class WebSocket[T](
     }
   }
 
-  implicit final class EventHandler(f: => Unit) {
+  final class EventHandler(val ordering: Long, f: => Unit) {
     @volatile var conn: RawWebSocket = null
     def apply(ws: RawWebSocket): Unit =
       this.synchronized {
@@ -172,12 +174,15 @@ abstract class WebSocket[T](
   }
 
   @volatile var connnectedHandlers = immutable.HashMap[String, EventHandler]()
-  def onConnected(key: String)(f: => Unit): Unit = {
-    connnectedHandlers += key -> f
-    fConnection.thenAccept { conn =>
-      connnectedHandlers.get(key).map(_(conn))
+  @volatile var handlerOrdering: Long = 0L
+  def onConnected(key: String)(f: => Unit): Unit =
+    synchronized {
+      connnectedHandlers += key -> new EventHandler(handlerOrdering, f)
+      fConnection.thenAccept { conn =>
+        connnectedHandlers.get(key).map(_(conn))
+      }
+      handlerOrdering += 1
     }
-  }
 
   def removeConnectedHandler(key: String): Unit = {
     connnectedHandlers -= key

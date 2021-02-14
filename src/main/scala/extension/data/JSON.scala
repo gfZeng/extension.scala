@@ -45,9 +45,9 @@ object JSON extends DefaultReaders {
     formats += fmt
   }
 
-  def parse(s: String): JValue = JsonMethods.parse(s)
+  def parse(s: String): JValue = JsonMethods.parse(s, useBigDecimalForDouble = true)
 
-  def parse(in: InputStream): JValue = JsonMethods.parse(in)
+  def parse(in: InputStream): JValue = JsonMethods.parse(in, useBigDecimalForDouble = true)
 
   def read[T](s: String)(implicit mf: scala.reflect.Manifest[T]): T = {
     Serialization.read[T](s)

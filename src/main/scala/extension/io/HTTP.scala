@@ -5,18 +5,14 @@ import okhttp3._
 import java.io.IOException
 import scala.concurrent.{Future, Promise}
 
-object HTTP {
-
-  implicit val defaultClient: OkHttpClient = new OkHttpClient()
-
-  def client(implicit impl: OkHttpClient = defaultClient): OkHttpClient = impl
+class HTTP(client: OkHttpClient = new OkHttpClient()) {
 
   def request(
-               method:  String                 = "GET",
-               uri:     String,
-               headers: List[(String, String)] = List(),
-               body:    String                 = null
-             ): Future[Response] = {
+      method:  String                 = "GET",
+      uri:     String,
+      headers: List[(String, String)] = List(),
+      body:    String                 = null
+  ): Future[Response] = {
     val builder = new Request.Builder().url(uri)
     var contentType: String = null
     headers.foreach { head =>
@@ -49,3 +45,5 @@ object HTTP {
   }
 
 }
+
+object HTTP extends HTTP(new OkHttpClient())

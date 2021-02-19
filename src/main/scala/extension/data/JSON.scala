@@ -1,5 +1,6 @@
 package extension.data
 
+import extension.data.JSON.codec
 import org.json4s.{
   CustomSerializer,
   DefaultFormats,
@@ -15,9 +16,12 @@ import org.json4s.native.{JsonMethods, Serialization}
 
 import java.io.InputStream
 
-object JSON extends DefaultReaders {
+class JSON(
+    codecs: Iterable[JSON#Codec[_]] = List()
+) extends DefaultReaders {
 
-  type JValue = org.json4s.JValue
+  type JValue   = org.json4s.JValue
+  type Codec[T] = Serializer[T]
 
   implicit object DecimalReader extends Reader[BigDecimal] {
     def read(value: JValue): BigDecimal =
@@ -35,15 +39,7 @@ object JSON extends DefaultReaders {
         )
       })
 
-  implicit var formats: Formats = DefaultFormats + BigDecimalSerializer
-
-  def registerEnums(es: Enumeration*): Unit = {
-    es.foreach(e => formats += new EnumNameSerializer(e))
-  }
-
-  def register(fmt: Serializer[_]): Unit = {
-    formats += fmt
-  }
+  implicit val formats: Formats = DefaultFormats + BigDecimalSerializer ++ codecs
 
   def parse(s: String): JValue = JsonMethods.parse(s, useBigDecimalForDouble = true)
 
@@ -56,4 +52,10 @@ object JSON extends DefaultReaders {
   def write[T](x: T): String = {
     Serialization.write[T](x)
   }
+}
+
+object JSON extends JSON(codecs = List()) {
+
+  def codec(e: Enumeration) = new EnumNameSerializer(e)
+
 }

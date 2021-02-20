@@ -35,7 +35,7 @@ class Telegram extends Notifier[String] with Bot[String] {
     val escaped = URLEncoder.encode(msg, "UTF-8")
     val data    = s"chat_id=$chatId&text=$escaped&parse_mode=Markdown"
     HTTP
-      .request(method = "POST", uri = s"$baseURL/sendMessage", headers = defaultHeaders, body = data)
+      .send(method = "POST", uri = s"$baseURL/sendMessage", headers = defaultHeaders, body = data)
       .map { rsp =>
         rsp.body().string()
         true
@@ -56,7 +56,7 @@ class Telegram extends Notifier[String] with Bot[String] {
       while (true) {
         val data = if (offset > 0) s"offset=$offset" else ""
         val f = HTTP
-          .request(method = "POST", uri = s"$baseURL/getUpdates", headers = defaultHeaders, data)
+          .send(method = "POST", uri = s"$baseURL/getUpdates", headers = defaultHeaders, data)
           .map { rsp =>
             val json      = JSON.parse(rsp.body().string())
             val msgs      = (json \ "result").children

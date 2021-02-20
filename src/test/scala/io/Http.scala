@@ -5,7 +5,7 @@ import extension.io.HTTP
 object Http {
 
   def main(args: Array[String]): Unit = {
-    HTTP.request(uri = "abc")
+    HTTP.send(uri = "abc")
   }
 
 }

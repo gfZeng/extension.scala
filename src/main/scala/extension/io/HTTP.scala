@@ -7,7 +7,15 @@ import scala.concurrent.{Future, Promise}
 
 class HTTP(client: OkHttpClient = new OkHttpClient()) {
 
+  @deprecated
   def request(
+      method:  String                 = "GET",
+      uri:     String,
+      headers: List[(String, String)] = List(),
+      body:    String                 = null
+  ): Future[Response] = send(method, uri, headers, body)
+
+  def send(
       method:  String                 = "GET",
       uri:     String,
       headers: List[(String, String)] = List(),

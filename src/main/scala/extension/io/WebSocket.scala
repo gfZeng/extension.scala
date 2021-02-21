@@ -3,6 +3,9 @@ package extension.io
 import extension.data.JSON
 import extension.data.JSON.JValue
 import extension.logging.{ILogger, Log}
+import org.apache.commons.compress.compressors.deflate64.Deflate64CompressorInputStream
+import org.json4s.JsonAST.JString
+import org.json4s.ParserUtil.ParseException
 import sun.net.ConnectionResetException
 
 import java.net.{SocketException, URI}
@@ -199,6 +202,20 @@ object WebSocket {
 
   implicit object JValueDecodeWithGZIP extends WebSocketDecoder[JValue] {
     override def apply(bb: ByteBuffer): JValue = JSON.parse(new GZIPInputStream(bb.inputStream))
+
+    override def apply(s: String): JValue = JSON.parse(s)
+  }
+
+  implicit object JValueDecodeWithDeflate64 extends WebSocketDecoder[JValue] {
+    override def apply(bb: ByteBuffer): JValue = {
+      val stream = new Deflate64CompressorInputStream(bb.inputStream)
+      try {
+        JSON.parse(stream)
+      } catch {
+        case _: ParseException =>
+          JString(new String(stream.readAllBytes))
+      }
+    }
 
     override def apply(s: String): JValue = JSON.parse(s)
   }
